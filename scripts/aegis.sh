@@ -127,17 +127,17 @@ EOF
 fi
 
 # install aegis monitor
-  until $download /system/bin/aegis_monitor.sh $url/scripts/aegis_monitor.sh || { logger "download aegis_monitor.sh failed, exit script" ; exit 1; } ;do
+  until $download /data/bin/aegis_monitor.sh $url/scripts/aegis_monitor.sh || { logger "download aegis_monitor.sh failed, exit script" ; exit 1; } ;do
     sleep 2
   done
-  chmod +x /system/bin/aegis_monitor.sh
+  chmod +x /data/bin/aegis_monitor.sh
   logger "aegis monitor installed"
 
 
 if [ $android_version -ge 9 ]; then
                 cat <<EOF > /system/etc/init/aegis_monitor.rc
 on property:sys.boot_completed=1
-                exec_background u:r:init:s0 root root -- /system/bin/aegis_monitor.sh
+                exec_background u:r:init:s0 root root -- /data/bin/aegis_monitor.sh
 EOF
                 chown root:root /system/etc/init/aegis_monitor.rc
                 chmod 644 /system/etc/init/aegis_monitor.rc
