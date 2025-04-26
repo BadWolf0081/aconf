@@ -84,7 +84,7 @@ mount_system_rw() {
     mount -o remount,rw /
   else
     mount -o remount,rw /system
-    mount -o remount,rw /system/etc/init.d
+    mount -o remount,rw /data/adb/service.d
   fi
 }
 
@@ -93,33 +93,33 @@ mount_system_ro() {
     mount -o remount,ro /
   else
     mount -o remount,ro /system
-    mount -o remount,ro /system/etc/init.d
+    mount -o remount,ro /data/adb/service.d
   fi
 }
 
 setup_initd_dir() {
   if [ $android_version -ge 9 ]; then
-    mkdir -p /system/etc/init.d
-    chmod 755 /system/etc/init.d
-    chown root:root /system/etc/init.d
+    mkdir -p /data/adb/service.d
+    chmod 755 /data/adb/service.d
+    chown root:root /data/adb/service.d
   fi
 }
 
 install_aegis(){
   mount_system_rw
   setup_initd_dir
-if [ ! -f /system/etc/init.d/42aegis ] ;then
-  until $download /system/etc/init.d/55aegis $url/scripts/55aegis || { logger "download 55aegis failed, exit script" ; exit 1; } ;do
+if [ ! -f /data/adb/service.d/42aegis ] ;then
+  until $download /data/adb/service.d/55aegis $url/scripts/55aegis || { logger "download 55aegis failed, exit script" ; exit 1; } ;do
     sleep 2
   done
-  chmod +x /system/etc/init.d/55aegis
+  chmod +x /data/adb/service.d/55aegis
   logger "55aegis installed"
 fi
 
 if [ $android_version -ge 9 ]; then
     cat <<EOF > /system/etc/init/55aegis.rc
 on property:sys.boot_completed=1
-    exec_background u:r:init:s0 root root -- /system/etc/init.d/55aegis
+    exec_background u:r:init:s0 root root -- /data/adb/service.d/55aegis
 EOF
     chown root:root /system/etc/init/55aegis.rc
     chmod 644 /system/etc/init/55aegis.rc
@@ -431,27 +431,27 @@ if [[ ! -f /data/local/aconf_download ]] ;then
   logger "file /data/local/aconf_download not found, exit script" && exit 1
 else
   if [[ $aconf_user == "" ]] ;then
-    download="/system/bin/curl -s -k -L --fail --show-error -o"
+    download="/data/bin/curl -s -k -L --fail --show-error -o"
   else
-    download="/system/bin/curl -s -k -L --fail --show-error --user $aconf_user:$aconf_pass -o"
+    download="/data/bin/curl -s -k -L --fail --show-error --user $aconf_user:$aconf_pass -o"
   fi
 fi
 
 #download latest aegis.sh
 if [[ $(basename $0) != "aegis_new.sh" ]] ;then
   mount_system_rw
-  oldsh=$(head -2 /system/bin/aegis.sh | grep '# version' | awk '{ print $NF }')
-  until $download /system/bin/aegis_new.sh $url/scripts/aegis.sh || { logger "download aegis.sh failed, exit script" ; exit 1; } ;do
+  oldsh=$(head -2 /data/bin/aegis.sh | grep '# version' | awk '{ print $NF }')
+  until $download /data/bin/aegis_new.sh $url/scripts/aegis.sh || { logger "download aegis.sh failed, exit script" ; exit 1; } ;do
     sleep 2
   done
-  chmod +x /system/bin/aegis_new.sh
-  newsh=$(head -2 /system/bin/aegis_new.sh | grep '# version' | awk '{ print $NF }')
+  chmod +x /data/bin/aegis_new.sh
+  newsh=$(head -2 /data/bin/aegis_new.sh | grep '# version' | awk '{ print $NF }')
   if [[ $oldsh != $newsh ]] ;then
     logger "aegis.sh updated $oldsh=>$newsh, restarting script"
 #   folder=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-    cp /system/bin/aegis_new.sh /system/bin/aegis.sh
+    cp /data/bin/aegis_new.sh /data/bin/aegis.sh
     mount_system_ro
-    /system/bin/aegis_new.sh $@
+    /data/bin/aegis_new.sh $@
     exit 1
   fi
 fi
@@ -484,17 +484,17 @@ fi
 
 #update 42aegis if needed
 if [[ $(basename $0) = "aegis_new.sh" ]] ;then
-  if [[ -f /system/etc/init.d/42aegis ]] ;then
-    old42=$(head -2 /system/etc/init.d/42aegis | grep '# version' | awk '{ print $NF }')
+  if [[ -f /data/adb/service.d/42aegis ]] ;then
+    old42=$(head -2 /data/adb/service.d/42aegis | grep '# version' | awk '{ print $NF }')
     if [ $Ver42aegis != $old42 ] ;then
       mount_system_rw
       setup_initd_dir
-      until $download /system/etc/init.d/42aegis $url/scripts/42aegis || { logger "download 42aegis failed, exit script" ; exit 1; } ;do
+      until $download /data/adb/service.d/42aegis $url/scripts/42aegis || { logger "download 42aegis failed, exit script" ; exit 1; } ;do
         sleep 2
       done
-      chmod +x /system/etc/init.d/42aegis
+      chmod +x /data/adb/service.d/42aegis
       mount_system_ro
-      new42=$(head -2 /system/etc/init.d/42aegis | grep '# version' | awk '{ print $NF }')
+      new42=$(head -2 /data/adb/service.d/42aegis | grep '# version' | awk '{ print $NF }')
       logger "42aegis updated $old42=>$new42"
     fi
   fi
@@ -502,17 +502,17 @@ fi
 
 #update 55aegis if needed
 if [[ $(basename $0) = "aegis_new.sh" ]] ;then
-  if [[ -f /system/etc/init.d/55aegis ]] ;then
-    old55=$(head -2 /system/etc/init.d/55aegis | grep '# version' | awk '{ print $NF }')
+  if [[ -f /data/adb/service.d/55aegis ]] ;then
+    old55=$(head -2 /data/adb/service.d/55aegis | grep '# version' | awk '{ print $NF }')
     if [ $Ver55aegis != $old55 ] ;then
       mount_system_rw
       setup_initd_dir
-      until $download /system/etc/init.d/55aegis $url/scripts/55aegis || { logger "download 55aegis failed, exit script" ; exit 1; } ;do
+      until $download /data/adb/service.d/55aegis $url/scripts/55aegis || { logger "download 55aegis failed, exit script" ; exit 1; } ;do
         sleep 2
       done
-      chmod +x /system/etc/init.d/55aegis
+      chmod +x /data/adb/service.d/55aegis
       mount_system_ro
-      new55=$(head -2 /system/etc/init.d/55aegis | grep '# version' | awk '{ print $NF }')
+      new55=$(head -2 /data/adb/service.d/55aegis | grep '# version' | awk '{ print $NF }')
       logger "55aegis updated $old55=>$new55"
     fi
   fi
@@ -520,24 +520,24 @@ fi
 
 #update aegis monitor if needed
 if [[ $(basename $0) = "aegis_new.sh" ]] ;then
-  [ -f /system/bin/aegis_monitor.sh ] && oldMonitor=$(head -2 /system/bin/aegis_monitor.sh | grep '# version' | awk '{ print $NF }') || oldMonitor="0"
+  [ -f /data/bin/aegis_monitor.sh ] && oldMonitor=$(head -2 /data/bin/aegis_monitor.sh | grep '# version' | awk '{ print $NF }') || oldMonitor="0"
   if [ $VerMonitor != $oldMonitor ] ;then
     mount_system_rw
-    until $download /system/bin/aegis_monitor.sh $url/scripts/aegis_monitor.sh || { logger "download aegis_monitor.sh failed, exit script" ; exit 1; } ;do
+    until $download /data/bin/aegis_monitor.sh $url/scripts/aegis_monitor.sh || { logger "download aegis_monitor.sh failed, exit script" ; exit 1; } ;do
       sleep 2
     done
-    chmod +x /system/bin/aegis_monitor.sh
+    chmod +x /data/bin/aegis_monitor.sh
     mount_system_ro
-    newMonitor=$(head -2 /system/bin/aegis_monitor.sh | grep '# version' | awk '{ print $NF }')
+    newMonitor=$(head -2 /data/bin/aegis_monitor.sh | grep '# version' | awk '{ print $NF }')
     logger "aegis monitor updated $oldMonitor => $newMonitor"
 
     # restart aegis monitor
-    if [[ $(grep useMonitor $aconf_versions | awk -F "=" '{ print $NF }') == "true" ]] && [ -f /system/bin/aegis_monitor.sh ] ;then
-      checkMonitor=$(pgrep -f /system/bin/aegis_monitor.sh)
+    if [[ $(grep useMonitor $aconf_versions | awk -F "=" '{ print $NF }') == "true" ]] && [ -f /data/bin/aegis_monitor.sh ] ;then
+      checkMonitor=$(pgrep -f /data/bin/aegis_monitor.sh)
       if [ ! -z $checkMonitor ] ;then
         kill -9 $checkMonitor
         sleep 2
-        /system/bin/aegis_monitor.sh >/dev/null 2>&1 &
+        /data/bin/aegis_monitor.sh >/dev/null 2>&1 &
         logger "aegis monitor restarted"
       fi
     fi
@@ -546,25 +546,25 @@ fi
 
 #update AegisDetails sender if needed
 if [[ $(basename $0) = "aegis_new.sh" ]] ;then
-  [ -f /system/bin/AegisDetailsSender.sh ] && oldSender=$(head -2 /system/bin/AegisDetailsSender.sh | grep '# version' | awk '{ print $NF }') || oldSender="0"
+  [ -f /data/bin/AegisDetailsSender.sh ] && oldSender=$(head -2 /data/bin/AegisDetailsSender.sh | grep '# version' | awk '{ print $NF }') || oldSender="0"
   if [ $VerATVsender != $oldSender ] ;then
     mount_system_rw
-    until $download /system/bin/AegisDetailsSender.sh $url/scripts/AegisDetailsSender.sh || { logger "download AegisDetailsSender.sh failed, exit script" ; exit 1; } ;do
+    until $download /data/bin/AegisDetailsSender.sh $url/scripts/AegisDetailsSender.sh || { logger "download AegisDetailsSender.sh failed, exit script" ; exit 1; } ;do
       sleep 2
     done
-    chmod +x /system/bin/AegisDetailsSender.sh
+    chmod +x /data/bin/AegisDetailsSender.sh
     mount_system_ro
-    newSender=$(head -2 /system/bin/AegisDetailsSender.sh | grep '# version' | awk '{ print $NF }')
+    newSender=$(head -2 /data/bin/AegisDetailsSender.sh | grep '# version' | awk '{ print $NF }')
     logger "AegisDetails sender updated $oldSender => $newSender"
 
     # restart AegisDetails sender
-    if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }') == "true" ]] && [ -f /system/bin/AegisDetailsSender.sh ] ;then
-      checkSender=$(pgrep -f /system/bin/AegisDetailsSender.sh)
+    if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }') == "true" ]] && [ -f /data/bin/AegisDetailsSender.sh ] ;then
+      checkSender=$(pgrep -f /data/bin/AegisDetailsSender.sh)
       if [ ! -z $checkSender ] ;then
         kill -9 $checkSender
         sleep 2
       fi
-      /system/bin/AegisDetailsSender.sh >/dev/null 2>&1 &
+      /data/bin/AegisDetailsSender.sh >/dev/null 2>&1 &
       logger "AegisDetails sender (re)started"
     fi
   fi
@@ -626,19 +626,19 @@ if [[ $2 == https://* ]] ;then
 fi
 
 # enable aegis monitor
-if [[ $(grep useMonitor $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsub(/ /,""); print }') == "true" ]] && [ -f /system/bin/aegis_monitor.sh ] ;then
-  checkMonitor=$(pgrep -f /system/bin/aegis_monitor.sh)
+if [[ $(grep useMonitor $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsub(/ /,""); print }') == "true" ]] && [ -f /data/bin/aegis_monitor.sh ] ;then
+  checkMonitor=$(pgrep -f /data/bin/aegis_monitor.sh)
   if [ -z $checkMonitor ] ;then
-    /system/bin/aegis_monitor.sh >/dev/null 2>&1 &
+    /data/bin/aegis_monitor.sh >/dev/null 2>&1 &
     echo "`date +%Y-%m-%d_%T` aegis.sh: aegis monitor enabled" >> $logfile
   fi
 fi
 
 # enable AegisDetails sender
-if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsub(/ /,""); print }') == "true" ]] && [ -f /system/bin/AegisDetailsSender.sh ] ;then
-  checkSender=$(pgrep -f /system/bin/AegisDetailsSender.sh)
+if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsub(/ /,""); print }') == "true" ]] && [ -f /data/bin/AegisDetailsSender.sh ] ;then
+  checkSender=$(pgrep -f /data/bin/AegisDetailsSender.sh)
   if [ -z $checkSender ] ;then
-    /system/bin/AegisDetailsSender.sh >/dev/null 2>&1 &
+    /data/bin/AegisDetailsSender.sh >/dev/null 2>&1 &
     echo "`date +%Y-%m-%d_%T` aegis.sh: AegisDetails sender started" >> $logfile
   fi
 fi
