@@ -57,9 +57,9 @@ logger() {
 if [[ ! -z $discord_webhook ]] ;then
   echo "`date +%Y-%m-%d_%T` aegis.sh: $1" >> $logfile
   if [[ -z $origin ]] ;then
-    curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aegis.sh\", \"content\": \" $1 \"}"  $discord_webhook &>/dev/null
+    /data/bin/curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aegis.sh\", \"content\": \" $1 \"}"  $discord_webhook &>/dev/null
   else
-    curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aegis.sh\", \"content\": \" $origin: $1 \"}"  $discord_webhook &>/dev/null
+    /data/bin/curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aegis.sh\", \"content\": \" $origin: $1 \"}"  $discord_webhook &>/dev/null
   fi
 else
   echo "`date +%Y-%m-%d_%T` aegis.sh: $1" >> $logfile
@@ -403,16 +403,16 @@ if [[ -z $webhook ]] ;then
   echo "`date +%Y-%m-%d_%T` aegis.sh: no webhook set in job" >> $logfile
 else
   # aconf log
-  curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aconf log sender\", \"content\": \"aconf.log for $origin\"}" -F "file1=@$logfile" $webhook &>/dev/null
+  /data/bin/curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aconf log sender\", \"content\": \"aconf.log for $origin\"}" -F "file1=@$logfile" $webhook &>/dev/null
   # monitor log
-  [[ -f /sdcard/aegis_monitor.log ]] && curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aconf log sender\", \"content\": \"aegis_monitor.log for $origin\"}" -F "file1=@/sdcard/aegis_monitor.log" $webhook &>/dev/null
+  [[ -f /sdcard/aegis_monitor.log ]] && /data/bin/curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aconf log sender\", \"content\": \"aegis_monitor.log for $origin\"}" -F "file1=@/sdcard/aegis_monitor.log" $webhook &>/dev/null
   # aegis log
   cp /data/local/tmp/aegis.log /sdcard/aegis.log
-  curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aconf log sender\", \"content\": \"aegis.log for $origin\"}" -F "file1=@/sdcard/aegis.log" $webhook &>/dev/null
+  /data/bin/curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aconf log sender\", \"content\": \"aegis.log for $origin\"}" -F "file1=@/sdcard/aegis.log" $webhook &>/dev/null
   rm /sdcard/aegis.log
   #logcat
   logcat -d > /sdcard/logcat.txt
-  curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aconf log sender\", \"content\": \"logcat.txt for $origin\"}" -F "file1=@/sdcard/logcat.txt" $webhook &>/dev/null
+  /data/bin/curl -S -k -L --fail --show-error -F "payload_json={\"username\": \"aconf log sender\", \"content\": \"logcat.txt for $origin\"}" -F "file1=@/sdcard/logcat.txt" $webhook &>/dev/null
   rm -f /sdcard/logcat.txt
   echo "`date +%Y-%m-%d_%T` aegis.sh: sending logs to discord" >> $logfile
 fi
@@ -431,9 +431,9 @@ if [[ ! -f /data/local/aconf_download ]] ;then
   logger "file /data/local/aconf_download not found, exit script" && exit 1
 else
   if [[ $aconf_user == "" ]] ;then
-    download="/data/bin/curl -s -k -L --fail --show-error -o"
+    download="/data/bin//data/bin/curl -s -k -L --fail --show-error -o"
   else
-    download="/data/bin/curl -s -k -L --fail --show-error --user $aconf_user:$aconf_pass -o"
+    download="/data/bin//data/bin/curl -s -k -L --fail --show-error --user $aconf_user:$aconf_pass -o"
   fi
 fi
 
