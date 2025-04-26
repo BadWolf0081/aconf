@@ -212,7 +212,7 @@ else
 fi
 
 # Set for reboot device
-reboot=1
+reboot=0
 
 ## Send final webhook
 # discord_config_wh=$(grep 'discord_webhook' $aconf_versions | awk -F "=" '{ print $NF }')
