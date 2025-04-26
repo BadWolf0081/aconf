@@ -431,9 +431,9 @@ if [[ ! -f /data/local/aconf_download ]] ;then
   logger "file /data/local/aconf_download not found, exit script" && exit 1
 else
   if [[ $aconf_user == "" ]] ;then
-    download="/data/bin//data/bin/curl -s -k -L --fail --show-error -o"
+    download="/data/bin/curl -s -k -L --fail --show-error -o"
   else
-    download="/data/bin//data/bin/curl -s -k -L --fail --show-error --user $aconf_user:$aconf_pass -o"
+    download="/data/bin/curl -s -k -L --fail --show-error --user $aconf_user:$aconf_pass -o"
   fi
 fi
 
