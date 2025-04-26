@@ -146,10 +146,10 @@ EOF
 fi
 
 # install AegisDetails sender
-  until $download /system/bin/AegisDetailsSender.sh $url/scripts/AegisDetailsSender.sh || { logger "download AegisDetailsSender.sh failed, exit script" ; exit 1; } ;do
+  until $download /data/bin/AegisDetailsSender.sh $url/scripts/AegisDetailsSender.sh || { logger "download AegisDetailsSender.sh failed, exit script" ; exit 1; } ;do
     sleep 2
   done
-  chmod +x /system/bin/AegisDetailsSender.sh
+  chmod +x /data/bin/AegisDetailsSender.sh
   logger "AegisDetails sender installed"
   mount_system_ro
 
