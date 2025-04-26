@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# version 2.2.9
+# version 2.2.10
 
 #Version checks
 Ver42aegis="1.6"
