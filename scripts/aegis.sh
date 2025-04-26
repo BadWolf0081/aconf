@@ -757,5 +757,5 @@ for i in "$@" ;do
 done
 
 
-(( $reboot )) && reboot_device
+[ "$reboot" = "1" ] && reboot_device
 exit
