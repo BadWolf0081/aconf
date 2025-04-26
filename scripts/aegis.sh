@@ -644,15 +644,15 @@ if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsu
 fi
 
 # check aegis running
-aegis_check=$(ps -e | grep com.pokemod.aegis:mapping | awk '{print $9}')
-if [[ -z $aegis_check ]] && [[ -f /data/local/tmp/aegis_config.json ]] ;then
-  logger "aegis not running at execution of aegis.sh, starting it"
-  if [ $android_version -ge 9 ]; then
-    am start-foreground-service com.pokemod.aegis/com.pokemod.aegis.services.MappingService
-  else
-    am startservice com.pokemod.aegis/com.pokemod.aegis.services.MappingService
-  fi
-fi
+#aegis_check=$(ps -e | grep com.pokemod.aegis:mapping | awk '{print $9}')
+#if [[ -z $aegis_check ]] && [[ -f /data/local/tmp/aegis_config.json ]] ;then
+#  logger "aegis not running at execution of aegis.sh, starting it"
+#  if [ $android_version -ge 9 ]; then
+#    am start-foreground-service com.pokemod.aegis/com.pokemod.aegis.services.MappingService
+#  else
+#    am startservice com.pokemod.aegis/com.pokemod.aegis.services.MappingService
+#  fi
+#fi
 
 # check if playstore is enabled
 if [ "$(pm list packages -d com.android.vending)" = "package:com.android.vending" ] ;then
