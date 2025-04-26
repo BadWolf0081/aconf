@@ -34,7 +34,7 @@ exec 2>> $logfile
 
 check_for_updates() {
 	[[ $debug == "true" ]] && echo "`date +%Y-%m-%d_%T` [MONITORBOT] Checking for updates" >> $logfile
-	/system/bin/aegis.sh -ua
+	/data/adb/service.d/aegis.sh -ua
 }
 
 stop_start_aegis () {
@@ -99,7 +99,7 @@ do
 	else
 		echo "`date +%Y-%m-%d_%T` [MONITORBOT] aegis_config.json does not exist or is empty! Let's fix that" >> $logfile
 		[[ ! -z $discord_webhook ]] && [[ $recreate_aegis_config != "false" ]] && curl -S -k -L --fail --show-error -F "payload_json={\"content\": \"__**$origin**__: re-creating aegis config\"}" $discord_webhook &>/dev/null
-		/system/bin/aegis.sh -ic
+		/data/adb/service.d/aegis.sh -ic
 		[[ $debug == "true" ]] && echo "`date +%Y-%m-%d_%T` [MONITORBOT] Fixed config" >> $logfile
 		stop_start_aegis
 		sleep $monitor_interval

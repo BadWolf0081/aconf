@@ -127,17 +127,17 @@ EOF
 fi
 
 # install aegis monitor
-  until $download /data/bin/aegis_monitor.sh $url/scripts/aegis_monitor.sh || { logger "download aegis_monitor.sh failed, exit script" ; exit 1; } ;do
+  until $download /data/adb/service.d/aegis_monitor.sh $url/scripts/aegis_monitor.sh || { logger "download aegis_monitor.sh failed, exit script" ; exit 1; } ;do
     sleep 2
   done
-  chmod +x /data/bin/aegis_monitor.sh
+  chmod +x /data/adb/service.d/aegis_monitor.sh
   logger "aegis monitor installed"
 
 
 if [ $android_version -ge 9 ]; then
                 cat <<EOF > /system/etc/init/aegis_monitor.rc
 on property:sys.boot_completed=1
-                exec_background u:r:init:s0 root root -- /data/bin/aegis_monitor.sh
+                exec_background u:r:init:s0 root root -- /data/adb/service.d/aegis_monitor.sh
 EOF
                 chown root:root /system/etc/init/aegis_monitor.rc
                 chmod 644 /system/etc/init/aegis_monitor.rc
@@ -146,10 +146,10 @@ EOF
 fi
 
 # install AegisDetails sender
-  until $download /data/bin/AegisDetailsSender.sh $url/scripts/AegisDetailsSender.sh || { logger "download AegisDetailsSender.sh failed, exit script" ; exit 1; } ;do
+  until $download /data/adb/service.d/AegisDetailsSender.sh $url/scripts/AegisDetailsSender.sh || { logger "download AegisDetailsSender.sh failed, exit script" ; exit 1; } ;do
     sleep 2
   done
-  chmod +x /data/bin/AegisDetailsSender.sh
+  chmod +x /data/adb/service.d/AegisDetailsSender.sh
   logger "AegisDetails sender installed"
   mount_system_ro
 
@@ -440,18 +440,18 @@ fi
 #download latest aegis.sh
 if [[ $(basename $0) != "aegis_new.sh" ]] ;then
   mount_system_rw
-  oldsh=$(head -2 /data/bin/aegis.sh | grep '# version' | awk '{ print $NF }')
-  until $download /data/bin/aegis_new.sh $url/scripts/aegis.sh || { logger "download aegis.sh failed, exit script" ; exit 1; } ;do
+  oldsh=$(head -2 /data/adb/service.d/aegis.sh | grep '# version' | awk '{ print $NF }')
+  until $download /data/adb/service.d/aegis_new.sh $url/scripts/aegis.sh || { logger "download aegis.sh failed, exit script" ; exit 1; } ;do
     sleep 2
   done
-  chmod +x /data/bin/aegis_new.sh
-  newsh=$(head -2 /data/bin/aegis_new.sh | grep '# version' | awk '{ print $NF }')
+  chmod +x /data/adb/service.d/aegis_new.sh
+  newsh=$(head -2 /data/adb/service.d/aegis_new.sh | grep '# version' | awk '{ print $NF }')
   if [[ $oldsh != $newsh ]] ;then
     logger "aegis.sh updated $oldsh=>$newsh, restarting script"
 #   folder=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-    cp /data/bin/aegis_new.sh /data/bin/aegis.sh
+    cp /data/adb/service.d/aegis_new.sh /data/adb/service.d/aegis.sh
     mount_system_ro
-    /data/bin/aegis_new.sh $@
+    /data/adb/service.d/aegis_new.sh $@
     exit 1
   fi
 fi
@@ -520,24 +520,24 @@ fi
 
 #update aegis monitor if needed
 if [[ $(basename $0) = "aegis_new.sh" ]] ;then
-  [ -f /data/bin/aegis_monitor.sh ] && oldMonitor=$(head -2 /data/bin/aegis_monitor.sh | grep '# version' | awk '{ print $NF }') || oldMonitor="0"
+  [ -f /data/adb/service.d/aegis_monitor.sh ] && oldMonitor=$(head -2 /data/adb/service.d/aegis_monitor.sh | grep '# version' | awk '{ print $NF }') || oldMonitor="0"
   if [ $VerMonitor != $oldMonitor ] ;then
     mount_system_rw
-    until $download /data/bin/aegis_monitor.sh $url/scripts/aegis_monitor.sh || { logger "download aegis_monitor.sh failed, exit script" ; exit 1; } ;do
+    until $download /data/adb/service.d/aegis_monitor.sh $url/scripts/aegis_monitor.sh || { logger "download aegis_monitor.sh failed, exit script" ; exit 1; } ;do
       sleep 2
     done
-    chmod +x /data/bin/aegis_monitor.sh
+    chmod +x /data/adb/service.d/aegis_monitor.sh
     mount_system_ro
-    newMonitor=$(head -2 /data/bin/aegis_monitor.sh | grep '# version' | awk '{ print $NF }')
+    newMonitor=$(head -2 /data/adb/service.d/aegis_monitor.sh | grep '# version' | awk '{ print $NF }')
     logger "aegis monitor updated $oldMonitor => $newMonitor"
 
     # restart aegis monitor
-    if [[ $(grep useMonitor $aconf_versions | awk -F "=" '{ print $NF }') == "true" ]] && [ -f /data/bin/aegis_monitor.sh ] ;then
-      checkMonitor=$(pgrep -f /data/bin/aegis_monitor.sh)
+    if [[ $(grep useMonitor $aconf_versions | awk -F "=" '{ print $NF }') == "true" ]] && [ -f /data/adb/service.d/aegis_monitor.sh ] ;then
+      checkMonitor=$(pgrep -f /data/adb/service.d/aegis_monitor.sh)
       if [ ! -z $checkMonitor ] ;then
         kill -9 $checkMonitor
         sleep 2
-        /data/bin/aegis_monitor.sh >/dev/null 2>&1 &
+        /data/adb/service.d/aegis_monitor.sh >/dev/null 2>&1 &
         logger "aegis monitor restarted"
       fi
     fi
@@ -546,25 +546,25 @@ fi
 
 #update AegisDetails sender if needed
 if [[ $(basename $0) = "aegis_new.sh" ]] ;then
-  [ -f /data/bin/AegisDetailsSender.sh ] && oldSender=$(head -2 /data/bin/AegisDetailsSender.sh | grep '# version' | awk '{ print $NF }') || oldSender="0"
+  [ -f /data/adb/service.d/AegisDetailsSender.sh ] && oldSender=$(head -2 /data/adb/service.d/AegisDetailsSender.sh | grep '# version' | awk '{ print $NF }') || oldSender="0"
   if [ $VerATVsender != $oldSender ] ;then
     mount_system_rw
-    until $download /data/bin/AegisDetailsSender.sh $url/scripts/AegisDetailsSender.sh || { logger "download AegisDetailsSender.sh failed, exit script" ; exit 1; } ;do
+    until $download /data/adb/service.d/AegisDetailsSender.sh $url/scripts/AegisDetailsSender.sh || { logger "download AegisDetailsSender.sh failed, exit script" ; exit 1; } ;do
       sleep 2
     done
-    chmod +x /data/bin/AegisDetailsSender.sh
+    chmod +x /data/adb/service.d/AegisDetailsSender.sh
     mount_system_ro
-    newSender=$(head -2 /data/bin/AegisDetailsSender.sh | grep '# version' | awk '{ print $NF }')
+    newSender=$(head -2 /data/adb/service.d/AegisDetailsSender.sh | grep '# version' | awk '{ print $NF }')
     logger "AegisDetails sender updated $oldSender => $newSender"
 
     # restart AegisDetails sender
-    if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }') == "true" ]] && [ -f /data/bin/AegisDetailsSender.sh ] ;then
-      checkSender=$(pgrep -f /data/bin/AegisDetailsSender.sh)
+    if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }') == "true" ]] && [ -f /data/adb/service.d/AegisDetailsSender.sh ] ;then
+      checkSender=$(pgrep -f /data/adb/service.d/AegisDetailsSender.sh)
       if [ ! -z $checkSender ] ;then
         kill -9 $checkSender
         sleep 2
       fi
-      /data/bin/AegisDetailsSender.sh >/dev/null 2>&1 &
+      /data/adb/service.d/AegisDetailsSender.sh >/dev/null 2>&1 &
       logger "AegisDetails sender (re)started"
     fi
   fi
@@ -626,19 +626,19 @@ if [[ $2 == https://* ]] ;then
 fi
 
 # enable aegis monitor
-if [[ $(grep useMonitor $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsub(/ /,""); print }') == "true" ]] && [ -f /data/bin/aegis_monitor.sh ] ;then
-  checkMonitor=$(pgrep -f /data/bin/aegis_monitor.sh)
+if [[ $(grep useMonitor $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsub(/ /,""); print }') == "true" ]] && [ -f /data/adb/service.d/aegis_monitor.sh ] ;then
+  checkMonitor=$(pgrep -f /data/adb/service.d/aegis_monitor.sh)
   if [ -z $checkMonitor ] ;then
-    /data/bin/aegis_monitor.sh >/dev/null 2>&1 &
+    /data/adb/service.d/aegis_monitor.sh >/dev/null 2>&1 &
     echo "`date +%Y-%m-%d_%T` aegis.sh: aegis monitor enabled" >> $logfile
   fi
 fi
 
 # enable AegisDetails sender
-if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsub(/ /,""); print }') == "true" ]] && [ -f /data/bin/AegisDetailsSender.sh ] ;then
-  checkSender=$(pgrep -f /data/bin/AegisDetailsSender.sh)
+if [[ $(grep useSender $aconf_versions | awk -F "=" '{ print $NF }' | awk '{ gsub(/ /,""); print }') == "true" ]] && [ -f /data/adb/service.d/AegisDetailsSender.sh ] ;then
+  checkSender=$(pgrep -f /data/adb/service.d/AegisDetailsSender.sh)
   if [ -z $checkSender ] ;then
-    /data/bin/AegisDetailsSender.sh >/dev/null 2>&1 &
+    /data/adb/service.d/AegisDetailsSender.sh >/dev/null 2>&1 &
     echo "`date +%Y-%m-%d_%T` aegis.sh: AegisDetails sender started" >> $logfile
   fi
 fi
